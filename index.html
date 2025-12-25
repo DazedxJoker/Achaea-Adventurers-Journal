@@ -3,504 +3,546 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Achaea Adventurer's Journal Database</title>
+    <title>Achaea Adventurer's Journal</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
             padding: 20px;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+        }
+
         h1 {
-            color: #58a6ff;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #00d4ff 0%, #00bfea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 10px;
         }
+
         .subtitle {
-            color: #8b949e;
-            margin-bottom: 20px;
+            color: #888;
+            font-size: 1.1em;
         }
-        .subtitle a {
-            color: #58a6ff;
-            text-decoration: none;
-        }
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .stat {
-            background: #161b22;
-            padding: 15px 20px;
-            border-radius: 6px;
-            border: 1px solid #30363d;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #58a6ff;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #8b949e;
-            margin-top: 5px;
-        }
+
         .filters {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 20px;
-            margin: 20px 0;
+            background: #16213e;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
+
         .filter-row {
             display: flex;
             gap: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        .filter-row:last-child {
-            margin-bottom: 0;
-        }
-        input, select {
-            flex: 1;
-            min-width: 200px;
-            padding: 10px 12px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            color: #c9d1d9;
-            font-size: 14px;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #58a6ff;
-        }
-        .filter-label {
-            color: #8b949e;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            display: block;
-        }
+
         .filter-group {
             flex: 1;
             min-width: 200px;
         }
+
+        label {
+            display: block;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            background: #0f3460;
+            border: 2px solid #1a4d7a;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        select option {
+            background: #0f3460;
+            color: #e0e0e0;
+        }
+
         .label-cloud {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #30363d;
+            gap: 8px;
+            margin-top: 10px;
         }
-        .label-cloud-item {
-            display: inline-block;
+
+        .label-tag {
             padding: 6px 12px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            font-size: 12px;
-            color: #8b949e;
+            background: #0f3460;
+            border: 2px solid #1a4d7a;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.9em;
         }
-        .label-cloud-item:hover {
-            border-color: #58a6ff;
-            color: #58a6ff;
+
+        .label-tag:hover {
+            background: #1a4d7a;
+            transform: translateY(-2px);
         }
-        .label-cloud-item.active {
-            background: #1f6feb;
-            border-color: #1f6feb;
-            color: white;
+
+        .label-tag.active {
+            background: #00d4ff;
+            color: #0a0a0a;
+            border-color: #00d4ff;
         }
-        .entries {
-            margin-top: 20px;
+
+        .label-tag.quest {
+            border-color: #0969DA;
         }
-        .entry {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: border-color 0.2s;
+
+        .label-tag.area {
+            border-color: #1A7F37;
         }
-        .entry:hover {
-            border-color: #58a6ff;
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
-        .entry-header {
+
+        .stat-card {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff 0%, #00bfea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #888;
+            margin-top: 8px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .hints-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .hint-card {
+            background: #16213e;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #00d4ff;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .hint-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+        }
+
+        .hint-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            gap: 15px;
         }
-        .entry-date {
-            color: #58a6ff;
+
+        .hint-title {
+            font-size: 1.3em;
+            color: #00d4ff;
             font-weight: 600;
+            flex: 1;
         }
-        .entry-char {
-            color: #8b949e;
-        }
-        .entry-quest-num {
-            color: #a371f7;
-            font-weight: 600;
-        }
-        .entry-hint {
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 12px;
-            color: #c9d1d9;
-        }
-        .entry-footer {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .label {
-            display: inline-block;
-            padding: 3px 10px;
+
+        .hint-number {
+            background: #0969DA;
+            color: white;
+            padding: 4px 12px;
             border-radius: 12px;
-            font-size: 11px;
+            font-size: 0.9em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .hint-text {
+            color: #b0b0b0;
+            line-height: 1.6;
+            margin: 15px 0;
+            font-size: 1.05em;
+        }
+
+        .hint-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .hint-label {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
             font-weight: 500;
         }
-        .label.area {
-            background: #1f6feb;
+
+        .hint-label.area {
+            background: #1A7F37;
             color: white;
         }
-        .label.quest {
-            background: #a371f7;
+
+        .hint-label.quest {
+            background: #0969DA;
             color: white;
         }
-        .label.solved {
-            background: #3fb950;
-            color: white;
+
+        .hint-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #1a4d7a;
+            font-size: 0.9em;
+            color: #666;
         }
-        .label.type {
-            background: #f78166;
-            color: white;
-        }
-        .entry-link {
-            margin-left: auto;
-            font-size: 12px;
-        }
-        .entry-link a {
-            color: #58a6ff;
+
+        .view-link {
+            color: #00d4ff;
             text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
         }
-        .entry-link a:hover {
-            text-decoration: underline;
+
+        .view-link:hover {
+            color: #00bfea;
         }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
         .loading {
             text-align: center;
             padding: 40px;
-            color: #8b949e;
+            font-size: 1.2em;
+            color: #00d4ff;
         }
-        .info-box {
-            background: #1f6feb1a;
-            border: 1px solid #1f6feb;
-            border-radius: 6px;
-            padding: 12px 16px;
-            margin: 20px 0;
-            font-size: 14px;
-            color: #58a6ff;
-        }
-        .info-box strong {
-            display: block;
-            margin-bottom: 8px;
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .hint-header {
+                flex-direction: column;
+            }
+
+            .hint-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🗺️ Achaea Adventurer's Journal Database</h1>
-        <p class="subtitle">
-            Community-sourced quest hints • 
-            <a href="https://github.com/DazedxJoker/Achaea-Adventurers-Journal" target="_blank">View on GitHub</a>
-        </p>
+        <header>
+            <h1>⚔️ Achaea Adventurer's Journal</h1>
+            <p class="subtitle">Community Quest Hint Database</p>
+        </header>
 
-        <div class="info-box">
-            <strong>💡 How to use labels:</strong>
-            Add labels to GitHub issues to organize quests! Examples: <code>area-mhaldor</code>, <code>area-moghedu</code>, <code>quest-123</code>, <code>type-combat</code>, <code>solved</code>
-        </div>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="totalEntries">-</div>
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalHints">-</div>
                 <div class="stat-label">Total Hints</div>
             </div>
-            <div class="stat">
-                <div class="stat-value" id="contributors">-</div>
-                <div class="stat-label">Contributors</div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalQuests">-</div>
+                <div class="stat-label">Identified Quests</div>
             </div>
-            <div class="stat">
-                <div class="stat-value" id="areaCount">-</div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalAreas">-</div>
                 <div class="stat-label">Areas</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="solvedCount">-</div>
-                <div class="stat-label">Solved</div>
             </div>
         </div>
 
         <div class="filters">
             <div class="filter-row">
                 <div class="filter-group">
-                    <label class="filter-label">Search</label>
-                    <input type="text" id="searchInput" placeholder="Search hints, characters, areas...">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Area Filter</label>
+                    <label for="areaFilter">Filter by Area</label>
                     <select id="areaFilter">
                         <option value="">All Areas</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Quest Number</label>
-                    <input type="text" id="questNumFilter" placeholder="e.g. 123">
+                    <label for="questSearch">Search Quest Number</label>
+                    <input type="text" id="questSearch" placeholder="e.g., 359">
+                </div>
+                <div class="filter-group">
+                    <label for="textSearch">Search Hint Text</label>
+                    <input type="text" id="textSearch" placeholder="Search keywords...">
                 </div>
             </div>
-            
-            <div class="label-cloud" id="labelCloud"></div>
+            <div>
+                <label>Filter by Labels (click to toggle)</label>
+                <div class="label-cloud" id="labelCloud"></div>
+            </div>
         </div>
 
-        <div class="entries" id="entries">
-            <div class="loading">Loading entries from GitHub...</div>
-        </div>
+        <div class="loading" id="loading">Loading hints...</div>
+        <div class="hints-container" id="hintsContainer"></div>
     </div>
 
     <script>
         const REPO_OWNER = 'DazedxJoker';
         const REPO_NAME = 'Achaea-Adventurers-Journal';
+        const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`;
 
-        let allEntries = [];
-        let allLabels = new Set();
+        let allHints = [];
         let activeFilters = new Set();
 
-        async function loadEntries() {
+        async function loadHints() {
             try {
-                const response = await fetch(
-                    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?state=all&labels=journal-entry&per_page=100`,
-                    { headers: { 'Accept': 'application/vnd.github.v3+json' }}
-                );
-                
+                const response = await fetch(`${API_URL}?state=all&per_page=100`);
                 const issues = await response.json();
-                allEntries = parseIssues(issues);
-                
-                collectLabels();
-                populateFilters();
+
+                allHints = issues.map(issue => {
+                    const hintMatch = issue.body?.match(/\*\*Hint:\*\* (.+)/);
+                    const questMatch = issue.title?.match(/Quest (\d+): (.+)/);
+                    
+                    return {
+                        number: issue.number,
+                        title: issue.title,
+                        questNumber: questMatch ? questMatch[1] : null,
+                        questName: questMatch ? questMatch[2] : null,
+                        hint: hintMatch ? hintMatch[1] : 'No hint text found',
+                        labels: issue.labels || [],
+                        url: issue.html_url,
+                        created: new Date(issue.created_at)
+                    };
+                });
+
                 updateStats();
-                renderEntries(allEntries);
+                populateFilters();
+                renderHints();
+                document.getElementById('loading').style.display = 'none';
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('entries').innerHTML = 
-                    '<div class="loading">Error loading. Check console.</div>';
+                console.error('Error loading hints:', error);
+                document.getElementById('loading').innerHTML = 
+                    '<div style="color: #ff6b6b;">Error loading hints. Please try again later.</div>';
             }
-        }
-
-        function parseIssues(issues) {
-            return issues.map(issue => {
-                const body = issue.body || '';
-                const dateMatch = body.match(/\*\*Date:\*\* (.+)/);
-                const charMatch = body.match(/\*\*Character:\*\* (.+)/);
-                const hintMatch = body.match(/\*\*Hint:\*\* (.+)/);
-                const questNumMatch = body.match(/\*\*Quest Number:\*\* (.+)/) || 
-                                     issue.title.match(/Quest #(\d+)/);
-                
-                const labels = issue.labels.map(l => l.name);
-                const areas = labels.filter(l => l.startsWith('area-'));
-                const questLabels = labels.filter(l => l.startsWith('quest-'));
-                const typeLabels = labels.filter(l => l.startsWith('type-'));
-                
-                return {
-                    id: issue.number,
-                    date: dateMatch ? dateMatch[1].trim() : 'Unknown',
-                    character: charMatch ? charMatch[1].trim() : 'Unknown',
-                    hint: hintMatch ? hintMatch[1].trim() : issue.title,
-                    questNum: questNumMatch ? questNumMatch[1].trim() : null,
-                    url: issue.html_url,
-                    labels: labels,
-                    areas: areas,
-                    questLabels: questLabels,
-                    typeLabels: typeLabels,
-                    created: issue.created_at,
-                    state: issue.state
-                };
-            });
-        }
-
-        function collectLabels() {
-            allLabels.clear();
-            allEntries.forEach(entry => {
-                entry.labels.forEach(label => {
-                    if (label !== 'journal-entry' && !label.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                        allLabels.add(label);
-                    }
-                });
-            });
-        }
-
-        function populateFilters() {
-            // Populate area dropdown
-            const areaFilter = document.getElementById('areaFilter');
-            const areas = Array.from(allLabels).filter(l => l.startsWith('area-')).sort();
-            
-            areaFilter.innerHTML = '<option value="">All Areas</option>';
-            areas.forEach(area => {
-                const displayName = area.replace('area-', '').replace(/-/g, ' ');
-                const count = allEntries.filter(e => e.areas.includes(area)).length;
-                const option = document.createElement('option');
-                option.value = area;
-                option.textContent = `${displayName} (${count})`;
-                areaFilter.appendChild(option);
-            });
-
-            // Populate label cloud
-            const labelCloud = document.getElementById('labelCloud');
-            const interestingLabels = Array.from(allLabels).filter(l => 
-                !l.startsWith('area-') && !l.startsWith('quest-')
-            ).sort();
-            
-            labelCloud.innerHTML = interestingLabels.map(label => {
-                const count = allEntries.filter(e => e.labels.includes(label)).length;
-                return `<span class="label-cloud-item" data-label="${label}">${label} (${count})</span>`;
-            }).join('');
-
-            // Add click handlers
-            document.querySelectorAll('.label-cloud-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const label = item.dataset.label;
-                    if (activeFilters.has(label)) {
-                        activeFilters.delete(label);
-                        item.classList.remove('active');
-                    } else {
-                        activeFilters.add(label);
-                        item.classList.add('active');
-                    }
-                    applyFilters();
-                });
-            });
         }
 
         function updateStats() {
-            document.getElementById('totalEntries').textContent = allEntries.length;
-            document.getElementById('contributors').textContent = 
-                new Set(allEntries.map(e => e.character)).size;
-            document.getElementById('areaCount').textContent = 
-                Array.from(allLabels).filter(l => l.startsWith('area-')).length;
-            document.getElementById('solvedCount').textContent = 
-                allEntries.filter(e => e.state === 'closed').length;
-        }
-
-        function applyFilters() {
-            let filtered = allEntries;
-
-            // Search filter
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            if (search) {
-                filtered = filtered.filter(e => 
-                    e.hint.toLowerCase().includes(search) ||
-                    e.character.toLowerCase().includes(search) ||
-                    e.areas.some(a => a.includes(search)) ||
-                    (e.questNum && e.questNum.includes(search))
-                );
-            }
-
-            // Area filter
-            const area = document.getElementById('areaFilter').value;
-            if (area) {
-                filtered = filtered.filter(e => e.areas.includes(area));
-            }
-
-            // Quest number filter
-            const questNum = document.getElementById('questNumFilter').value;
-            if (questNum) {
-                filtered = filtered.filter(e => 
-                    e.questNum && e.questNum.includes(questNum)
-                );
-            }
-
-            // Label filters
-            if (activeFilters.size > 0) {
-                filtered = filtered.filter(e => 
-                    Array.from(activeFilters).every(filter => e.labels.includes(filter))
-                );
-            }
-
-            renderEntries(filtered);
-        }
-
-        function renderEntries(entries) {
-            const container = document.getElementById('entries');
+            const questHints = allHints.filter(h => h.questNumber);
+            const areas = new Set();
             
-            if (entries.length === 0) {
-                container.innerHTML = '<div class="loading">No entries match your filters</div>';
+            allHints.forEach(hint => {
+                hint.labels.forEach(label => {
+                    if (label.name.startsWith('area-')) {
+                        areas.add(label.name);
+                    }
+                });
+            });
+
+            document.getElementById('totalHints').textContent = allHints.length;
+            document.getElementById('totalQuests').textContent = questHints.length;
+            document.getElementById('totalAreas').textContent = areas.size;
+        }
+
+        function populateFilters() {
+            // Populate area filter
+            const areas = new Set();
+            allHints.forEach(hint => {
+                hint.labels.forEach(label => {
+                    if (label.name.startsWith('area-')) {
+                        const areaName = label.name.replace('area-', '').replace(/-/g, ' ');
+                        areas.add(areaName);
+                    }
+                });
+            });
+
+            const areaSelect = document.getElementById('areaFilter');
+            Array.from(areas).sort().forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area.replace(/\b\w/g, l => l.toUpperCase());
+                areaSelect.appendChild(option);
+            });
+
+            // Populate label cloud
+            const allLabels = new Map();
+            allHints.forEach(hint => {
+                hint.labels.forEach(label => {
+                    if (!allLabels.has(label.name)) {
+                        allLabels.set(label.name, {
+                            name: label.name,
+                            count: 0,
+                            type: label.name.startsWith('quest-') ? 'quest' : 
+                                  label.name.startsWith('area-') ? 'area' : 'other'
+                        });
+                    }
+                    allLabels.get(label.name).count++;
+                });
+            });
+
+            const labelCloud = document.getElementById('labelCloud');
+            Array.from(allLabels.values())
+                .sort((a, b) => b.count - a.count)
+                .forEach(label => {
+                    const tag = document.createElement('div');
+                    tag.className = `label-tag ${label.type}`;
+                    tag.textContent = `${label.name} (${label.count})`;
+                    tag.onclick = () => toggleLabelFilter(label.name, tag);
+                    labelCloud.appendChild(tag);
+                });
+        }
+
+        function toggleLabelFilter(labelName, element) {
+            if (activeFilters.has(labelName)) {
+                activeFilters.delete(labelName);
+                element.classList.remove('active');
+            } else {
+                activeFilters.add(labelName);
+                element.classList.add('active');
+            }
+            renderHints();
+        }
+
+        function renderHints() {
+            const areaFilter = document.getElementById('areaFilter').value.toLowerCase();
+            const questSearch = document.getElementById('questSearch').value.toLowerCase();
+            const textSearch = document.getElementById('textSearch').value.toLowerCase();
+
+            let filtered = allHints.filter(hint => {
+                // Area filter
+                if (areaFilter) {
+                    const hasArea = hint.labels.some(l => 
+                        l.name.startsWith('area-') && 
+                        l.name.includes(areaFilter.replace(/\s+/g, '-'))
+                    );
+                    if (!hasArea) return false;
+                }
+
+                // Quest number search
+                if (questSearch && (!hint.questNumber || !hint.questNumber.includes(questSearch))) {
+                    return false;
+                }
+
+                // Text search
+                if (textSearch && !hint.hint.toLowerCase().includes(textSearch)) {
+                    return false;
+                }
+
+                // Active label filters
+                if (activeFilters.size > 0) {
+                    const hintLabels = new Set(hint.labels.map(l => l.name));
+                    if (![...activeFilters].every(f => hintLabels.has(f))) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            const container = document.getElementById('hintsContainer');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="no-results">No hints found matching your filters.</div>';
                 return;
             }
-            
-            container.innerHTML = entries.map(entry => {
-                const areaLabels = entry.areas.map(a => 
-                    `<span class="label area">${a.replace('area-', '')}</span>`
-                ).join('');
-                
-                const typeLabels = entry.typeLabels.map(t => 
-                    `<span class="label type">${t.replace('type-', '')}</span>`
-                ).join('');
-                
-                const questLabels = entry.questLabels.map(q => 
-                    `<span class="label quest">${q}</span>`
-                ).join('');
 
-                return `
-                    <div class="entry">
-                        <div class="entry-header">
-                            <span class="entry-date">📅 ${entry.date}</span>
-                            ${entry.questNum ? `<span class="entry-quest-num">Quest #${entry.questNum}</span>` : ''}
-                            <span class="entry-char">👤 ${escapeHtml(entry.character)}</span>
+            container.innerHTML = filtered.map(hint => `
+                <div class="hint-card">
+                    <div class="hint-header">
+                        <div class="hint-title">
+                            ${hint.questName || hint.title}
                         </div>
-                        <div class="entry-hint">${escapeHtml(entry.hint)}</div>
-                        <div class="entry-footer">
-                            ${areaLabels}
-                            ${typeLabels}
-                            ${questLabels}
-                            ${entry.state === 'closed' ? '<span class="label solved">✓ Solved</span>' : ''}
-                            <span class="entry-link">
-                                <a href="${entry.url}" target="_blank">View/Edit →</a>
-                            </span>
-                        </div>
+                        ${hint.questNumber ? `<div class="hint-number">Quest ${hint.questNumber}</div>` : ''}
                     </div>
-                `;
-            }).join('');
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+                    <div class="hint-text">${hint.hint}</div>
+                    ${hint.labels.length > 0 ? `
+                        <div class="hint-labels">
+                            ${hint.labels.map(label => `
+                                <span class="hint-label ${label.name.startsWith('quest-') ? 'quest' : label.name.startsWith('area-') ? 'area' : ''}">
+                                    ${label.name}
+                                </span>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="hint-footer">
+                        <span>Added ${hint.created.toLocaleDateString()}</span>
+                        <a href="${hint.url}" target="_blank" class="view-link">View on GitHub →</a>
+                    </div>
+                </div>
+            `).join('');
         }
 
         // Event listeners
-        document.getElementById('searchInput').addEventListener('input', applyFilters);
-        document.getElementById('areaFilter').addEventListener('change', applyFilters);
-        document.getElementById('questNumFilter').addEventListener('input', applyFilters);
+        document.getElementById('areaFilter').addEventListener('change', renderHints);
+        document.getElementById('questSearch').addEventListener('input', renderHints);
+        document.getElementById('textSearch').addEventListener('input', renderHints);
 
-        // Load on start
-        loadEntries();
-        
+        // Load on page load
+        loadHints();
+
         // Auto-refresh every 2 minutes
-        setInterval(loadEntries, 120000);
+        setInterval(loadHints, 120000);
     </script>
 </body>
 </html>
