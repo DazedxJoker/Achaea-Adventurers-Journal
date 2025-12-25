@@ -99,42 +99,6 @@
             color: #e0e0e0;
         }
 
-        .label-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .label-tag {
-            padding: 6px 12px;
-            background: #0f3460;
-            border: 2px solid #1a4d7a;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9em;
-        }
-
-        .label-tag:hover {
-            background: #1a4d7a;
-            transform: translateY(-2px);
-        }
-
-        .label-tag.active {
-            background: #00d4ff;
-            color: #0a0a0a;
-            border-color: #00d4ff;
-        }
-
-        .label-tag.quest {
-            border-color: #0969DA;
-        }
-
-        .label-tag.area {
-            border-color: #1A7F37;
-        }
-
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -338,10 +302,6 @@
                     <input type="text" id="textSearch" placeholder="Search keywords...">
                 </div>
             </div>
-            <div>
-                <label>Filter by Labels (click to toggle)</label>
-                <div class="label-cloud" id="labelCloud"></div>
-            </div>
         </div>
 
         <div class="loading" id="loading">Loading hints...</div>
@@ -354,7 +314,6 @@
         const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`;
 
         let allHints = [];
-        let activeFilters = new Set();
 
         async function loadHints() {
             try {
@@ -406,62 +365,29 @@
         }
 
         function populateFilters() {
-            // Populate area filter
+            // Populate area filter with unique areas
             const areas = new Set();
             allHints.forEach(hint => {
                 hint.labels.forEach(label => {
                     if (label.name.startsWith('area-')) {
+                        // Normalize: remove 'area-' prefix, replace dashes with spaces
                         const areaName = label.name.replace('area-', '').replace(/-/g, ' ');
-                        areas.add(areaName);
+                        areas.add(areaName.toLowerCase()); // Store lowercase for deduplication
                     }
                 });
             });
 
             const areaSelect = document.getElementById('areaFilter');
+            // Sort and add unique areas
             Array.from(areas).sort().forEach(area => {
                 const option = document.createElement('option');
-                option.value = area;
-                option.textContent = area.replace(/\b\w/g, l => l.toUpperCase());
+                option.value = area; // Keep lowercase for matching
+                // Title case for display
+                option.textContent = area.split(' ').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
                 areaSelect.appendChild(option);
             });
-
-            // Populate label cloud
-            const allLabels = new Map();
-            allHints.forEach(hint => {
-                hint.labels.forEach(label => {
-                    if (!allLabels.has(label.name)) {
-                        allLabels.set(label.name, {
-                            name: label.name,
-                            count: 0,
-                            type: label.name.startsWith('quest-') ? 'quest' : 
-                                  label.name.startsWith('area-') ? 'area' : 'other'
-                        });
-                    }
-                    allLabels.get(label.name).count++;
-                });
-            });
-
-            const labelCloud = document.getElementById('labelCloud');
-            Array.from(allLabels.values())
-                .sort((a, b) => b.count - a.count)
-                .forEach(label => {
-                    const tag = document.createElement('div');
-                    tag.className = `label-tag ${label.type}`;
-                    tag.textContent = `${label.name} (${label.count})`;
-                    tag.onclick = () => toggleLabelFilter(label.name, tag);
-                    labelCloud.appendChild(tag);
-                });
-        }
-
-        function toggleLabelFilter(labelName, element) {
-            if (activeFilters.has(labelName)) {
-                activeFilters.delete(labelName);
-                element.classList.remove('active');
-            } else {
-                activeFilters.add(labelName);
-                element.classList.add('active');
-            }
-            renderHints();
         }
 
         function renderHints() {
@@ -487,14 +413,6 @@
                 // Text search
                 if (textSearch && !hint.hint.toLowerCase().includes(textSearch)) {
                     return false;
-                }
-
-                // Active label filters
-                if (activeFilters.size > 0) {
-                    const hintLabels = new Set(hint.labels.map(l => l.name));
-                    if (![...activeFilters].every(f => hintLabels.has(f))) {
-                        return false;
-                    }
                 }
 
                 return true;
