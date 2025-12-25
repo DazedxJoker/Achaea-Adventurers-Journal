@@ -320,6 +320,12 @@
                 const response = await fetch(`${API_URL}?state=all&per_page=100`);
                 const issues = await response.json();
 
+                // Check if we got an error response
+                if (!Array.isArray(issues)) {
+                    console.error('API Error:', issues);
+                    throw new Error(issues.message || 'Failed to load issues');
+                }
+
                 allHints = issues.map(issue => {
                     const hintMatch = issue.body?.match(/\*\*Hint:\*\* (.+)/);
                     const questMatch = issue.title?.match(/Quest (\d+): (.+)/);
@@ -459,8 +465,8 @@
         // Load on page load
         loadHints();
 
-        // Auto-refresh every 2 minutes
-        setInterval(loadHints, 120000);
+        // Auto-refresh every 10 minutes (600000ms)
+        setInterval(loadHints, 600000);
     </script>
 </body>
 </html>
